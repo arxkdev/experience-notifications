@@ -9,6 +9,10 @@ import { RobloxExperienceNotificationsService } from "./services/roblox-experien
 import { QUEUES } from "./queue/queue-constants";
 import { showRoutes } from "hono/dev";
 import { config } from "./config";
+import { RedisStore } from "rate-limit-redis";
+import { getRedis } from "./lib/redis";
+import { settings } from "./lib/settings";
+import { analyzeFingerprintQuality, generateFingerprint } from "./lib/fingerprint";
 import fastRedact from "fast-redact";
 
 // Routes
@@ -20,6 +24,13 @@ import sendExperienceNotification from "./routes/sendExperienceNotification";
 import { logging } from "./middleware/logging";
 import { parseGzippedJson } from "./middleware/gzip-json";
 import { errorHandler } from "./middleware/error";
+import { rateLimiter } from "hono-rate-limiter";
+
+import type { Store } from "hono-rate-limiter";
+import type { RedisReply } from "rate-limit-redis";
+
+// Redis
+const redis = getRedis();
 
 // Constants
 const PORT = 3031;
@@ -51,6 +62,33 @@ async function init() {
 
   // Create the Hono app
   const app = new Hono();
+
+  // Rate limiter
+  app.use(
+    rateLimiter({
+      windowMs: settings.redis.windowMs,
+      limit: settings.redis.limit,
+      standardHeaders: "draft-6",
+      keyGenerator: (c) => {
+        const fingerprint = generateFingerprint(c);
+
+        // Log the fingerprint analysis in development
+        if (config.misc.NODE_ENV === "development") {
+          const analysis = analyzeFingerprintQuality(c);
+          console.log(analysis);
+        }
+
+        return fingerprint;
+      },
+      message: {
+        message: "Too many requests",
+        statusCode: 429,
+      },
+      store: new RedisStore({
+        sendCommand: (command: string, ...args: (string | number)[]) => redis.call(command, ...args) as unknown as Promise<RedisReply>,
+      }) as unknown as Store,
+    })
+  );
 
   // Logging
   app.use(logging);

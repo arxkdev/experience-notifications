@@ -18,7 +18,10 @@ export const config = {
   },
   encryption: {
     key: process.env.ENCRYPTION_KEY || "",
-  }
+  },
+  fingerprint: {
+    salt: process.env.FINGERPRINT_SALT || "",
+  },
 } as const;
 
 export type Config = typeof config;
