@@ -1,8 +1,9 @@
-# Use Node.js LTS (Long Term Support) as base image
-FROM node:20-slim
+FROM node:23-alpine
 
-# Install wget and curl for healthchecks, and pnpm
-RUN apt-get update && apt-get install -y wget curl && rm -rf /var/lib/apt/lists/*
+# Install wget and curl for healthchecks
+RUN apk add --no-cache wget curl
+
+# Install pnpm globally
 RUN npm install -g pnpm
 
 # Create app directory
