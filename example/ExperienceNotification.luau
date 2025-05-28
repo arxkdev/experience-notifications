@@ -79,7 +79,6 @@ function ExperienceNotification:Send(dateTime: DateTime | number, userId: number
 		Method = "POST",
 		Headers = {
 			["Content-Type"] = "application/json",
-			["Authorization"] = AttachKey("ENDPOINT_API_KEY"),
 			["X-Cloud-Api-Key"] = AttachKey("CLOUD_API_KEY")
 		},
 		Body = HttpService:JSONEncode({
@@ -109,11 +108,7 @@ end
 function ExperienceNotification:Get(jobId: string): GetResponse | nil
 	local Response = HttpService:RequestAsync({
 		Url = `{ENDPOINTS.Get}?jobId={jobId}`,
-		Method = "GET",
-		Headers = {
-			["Content-Type"] = "application/json",
-			["Authorization"] = AttachKey("ENDPOINT_API_KEY")
-		}
+		Method = "GET"
 	});
 
 	if (Response.Success) then
@@ -138,7 +133,6 @@ function ExperienceNotification:Cancel(jobId: string): CancelResponse | boolean
 		Method = "POST",
 		Headers = {
 			["Content-Type"] = "application/json",
-			["Authorization"] = AttachKey("ENDPOINT_API_KEY")
 		},
 		Body = HttpService:JSONEncode({
 			jobId = tostring(jobId)

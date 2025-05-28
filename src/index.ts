@@ -17,7 +17,6 @@ import cancelExperienceNotification from "./routes/cancelExperienceNotification"
 import sendExperienceNotification from "./routes/sendExperienceNotification";
 
 // Middleware
-import { authMiddleware } from "./middleware/auth";
 import { logging } from "./middleware/logging";
 import { parseGzippedJson } from "./middleware/gzip-json";
 import { errorHandler } from "./middleware/error";
@@ -52,9 +51,6 @@ async function init() {
 
   // Create the Hono app
   const app = new Hono();
-
-  // Apply Auth middleware
-  app.use(authMiddleware);
 
   // Logging
   app.use(logging);

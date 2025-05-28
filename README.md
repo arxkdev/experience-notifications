@@ -4,7 +4,6 @@
 ### https://roblox-notifications.arxk.cloud/api/send-experience-notification
 
 ### Headers
-- Authorization: `Bearer <access_token>`
 - X-Cloud-Api-Key: `xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx`
 
 ### Body
@@ -16,17 +15,11 @@
 ## Get Experience Notification Status (GET)
 ### https://roblox-notifications.arxk.cloud/api/get-experience-notification-status?jobId=xxxxxxxxxxx
 
-### Headers
-- Authorization: `Bearer <access_token>`
-
 ### Query Params
 - `jobId`: The ID of the job to get the status of.
 
 ## Cancel Experience Notification (POST)
 ### https://roblox-notifications.arxk.cloud/api/cancel-experience-notification
-
-### Headers
-- Authorization: `Bearer <access_token>`
 
 ### Body
 - `jobId`: The ID of the job to cancel.
