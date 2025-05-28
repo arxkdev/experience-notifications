@@ -12,6 +12,7 @@ import { config } from "./config";
 import { RedisStore } from "rate-limit-redis";
 import { getRedis } from "./lib/redis";
 import { settings } from "./lib/settings";
+import { analyzeFingerprintQuality, generateFingerprint } from "./lib/fingerprint";
 import fastRedact from "fast-redact";
 
 // Routes
@@ -68,7 +69,17 @@ async function init() {
       windowMs: settings.redis.windowMs,
       limit: settings.redis.limit,
       standardHeaders: "draft-6",
-      keyGenerator: (c) => c.req.header("x-forwarded-for") ?? "unknown",
+      keyGenerator: (c) => {
+        const fingerprint = generateFingerprint(c);
+
+        // Log the fingerprint analysis in development
+        if (config.misc.NODE_ENV === "development") {
+          const analysis = analyzeFingerprintQuality(c);
+          console.log(analysis);
+        }
+
+        return fingerprint;
+      },
       message: {
         message: "Too many requests",
         statusCode: 429,
